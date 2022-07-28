@@ -10,7 +10,7 @@ interface sutTypes {
   controllerStub: Controller;
 }
 
-const makeSut = (): sutTypes => {
+const makeControllerStub = (): Controller => {
   class ControllerStub implements Controller {
     async handle(httpRequest: HttpRequest): Promise<HttpResponse> {
       const httpResponse = {
@@ -24,7 +24,11 @@ const makeSut = (): sutTypes => {
       return new Promise((resolve) => resolve(httpResponse));
     }
   }
-  const controllerStub = new ControllerStub();
+  return new ControllerStub();
+};
+
+const makeSut = (): sutTypes => {
+  const controllerStub = makeControllerStub();
   const sut = new LogControllerDecorator(controllerStub);
   return {
     controllerStub,
