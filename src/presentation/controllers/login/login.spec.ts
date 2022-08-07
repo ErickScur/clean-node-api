@@ -10,6 +10,7 @@ import {
   HttpRequest,
   Authentication,
   Validation,
+  AuthenticationModel,
 } from './login-protocols';
 import { LoginController } from './login';
 
@@ -21,7 +22,7 @@ interface SutTypes {
 
 const makeAuthentication = (): Authentication => {
   class AuthenticationStub implements Authentication {
-    async auth(email: string, password: string): Promise<string> {
+    async auth(authentication: AuthenticationModel): Promise<string> {
       return 'any_token';
     }
   }
@@ -73,7 +74,10 @@ describe('Login Controller', () => {
 
     const httpRequest = makeFakeRequest();
     await sut.handle(httpRequest);
-    expect(authSpy).toHaveBeenCalledWith('any_email@mail.com', 'any_password');
+    expect(authSpy).toHaveBeenCalledWith({
+      email: 'any_email@mail.com',
+      password: 'any_password',
+    });
   });
 
   test('Should return 401 if invalid credentials are provided', async () => {
