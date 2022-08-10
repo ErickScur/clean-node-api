@@ -1,4 +1,4 @@
-import { AddAccountRepository } from '../../../../data/protocols/add-addcount-repository';
+import { AddAccountRepository } from '../../../../data/protocols/db/add-addcount-repository';
 import { AccountModel } from '../../../../domain/models/account';
 import { AddAccountModel } from '../../../../domain/usecases/add-account';
 import { MongoHelper } from '../helpers/mongo-helper';
