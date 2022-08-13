@@ -1,6 +1,7 @@
 import { HashComparer } from '../../protocols/criptography/hash-comparer';
 import { TokenGenerator } from '../../protocols/criptography/token-generator';
 import { LoadAccountByEmailRepository } from '../../protocols/db/load-account-by-email-repository';
+import { UpdateAccessTokenRepository } from '../../protocols/db/update-access-token-repository';
 import { AccountModel } from '../add-account/db-add-account-protocols';
 import { DbAuthentication } from './db-authentication';
 
@@ -9,7 +10,17 @@ interface sutTypes {
   loadAccountByEmailRepositorystub: LoadAccountByEmailRepository;
   hashComparerStub: HashComparer;
   tokenGeneratorStub: TokenGenerator;
+  updateAccessTokenRepositoryStub: UpdateAccessTokenRepository;
 }
+
+const makeUpdateAccesTokenRepository = (): UpdateAccessTokenRepository => {
+  class UpdateAccessTokenRepositoryStub implements UpdateAccessTokenRepository {
+    async update(id: string, token: string): Promise<void> {
+      return null;
+    }
+  }
+  return new UpdateAccessTokenRepositoryStub();
+};
 
 const makeFakeAccount = (): AccountModel => {
   const account: AccountModel = {
@@ -53,16 +64,19 @@ const makeSut = (): sutTypes => {
   const loadAccountByEmailRepositorystub =
     new LoadAccountByEmailRepositoryStub();
   const tokenGeneratorStub = makeTokenGenerator();
+  const updateAccessTokenRepositoryStub = makeUpdateAccesTokenRepository();
   const sut = new DbAuthentication(
     loadAccountByEmailRepositorystub,
     hashComparerStub,
     tokenGeneratorStub,
+    updateAccessTokenRepositoryStub,
   );
   return {
     sut,
     loadAccountByEmailRepositorystub,
     hashComparerStub,
     tokenGeneratorStub,
+    updateAccessTokenRepositoryStub,
   };
 };
 
@@ -173,5 +187,15 @@ describe('DbAuthentication UseCase', () => {
       password: 'any_password',
     });
     expect(accessToken).toBe('any_token');
+  });
+
+  test('Should call UpdateAccessTokenRepository with correct values', async () => {
+    const { sut, updateAccessTokenRepositoryStub } = makeSut();
+    const updateSpy = jest.spyOn(updateAccessTokenRepositoryStub, 'update');
+    await sut.auth({
+      email: 'any_email@mail.com',
+      password: 'any_password',
+    });
+    expect(updateSpy).toHaveBeenCalledWith('any_id', 'any_token');
   });
 });
