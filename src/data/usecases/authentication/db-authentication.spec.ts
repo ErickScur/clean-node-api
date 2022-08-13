@@ -1,4 +1,5 @@
 import { HashComparer } from '../../protocols/criptography/hash-comparer';
+import { TokenGenerator } from '../../protocols/criptography/token-generator';
 import { LoadAccountByEmailRepository } from '../../protocols/db/load-account-by-email-repository';
 import { AccountModel } from '../add-account/db-add-account-protocols';
 import { DbAuthentication } from './db-authentication';
@@ -7,6 +8,7 @@ interface sutTypes {
   sut: DbAuthentication;
   loadAccountByEmailRepositorystub: LoadAccountByEmailRepository;
   hashComparerStub: HashComparer;
+  tokenGeneratorStub: TokenGenerator;
 }
 
 const makeFakeAccount = (): AccountModel => {
@@ -28,6 +30,15 @@ const makeHashComparer = (): HashComparer => {
   return new HashComparerStub();
 };
 
+const makeTokenGenerator = (): TokenGenerator => {
+  class TokenGeneratorStub implements TokenGenerator {
+    async generate(id: string): Promise<string> {
+      return new Promise((resolve) => resolve('any_token'));
+    }
+  }
+  return new TokenGeneratorStub();
+};
+
 const makeSut = (): sutTypes => {
   class LoadAccountByEmailRepositoryStub
     implements LoadAccountByEmailRepository
@@ -41,14 +52,17 @@ const makeSut = (): sutTypes => {
   const hashComparerStub = makeHashComparer();
   const loadAccountByEmailRepositorystub =
     new LoadAccountByEmailRepositoryStub();
+  const tokenGeneratorStub = makeTokenGenerator();
   const sut = new DbAuthentication(
     loadAccountByEmailRepositorystub,
     hashComparerStub,
+    tokenGeneratorStub,
   );
   return {
     sut,
     loadAccountByEmailRepositorystub,
     hashComparerStub,
+    tokenGeneratorStub,
   };
 };
 
@@ -125,5 +139,15 @@ describe('DbAuthentication UseCase', () => {
       password: 'any_password',
     });
     expect(accessToken).toBe(null);
+  });
+
+  test('Should call TokenGenerator with correct id', async () => {
+    const { sut, tokenGeneratorStub } = makeSut();
+    const generateSpy = jest.spyOn(tokenGeneratorStub, 'generate');
+    await sut.auth({
+      email: 'any_email@mail.com',
+      password: 'any_password',
+    });
+    expect(generateSpy).toHaveBeenCalledWith('any_id');
   });
 });
