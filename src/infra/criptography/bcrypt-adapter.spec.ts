@@ -52,16 +52,28 @@ describe('Bcrypt Adapter', () => {
     await expect(promise).rejects.toThrow();
   });
 
-  test('Should call comparer with correct values', async () => {
+  test('Should call compare with correct values', async () => {
     const { sut } = makeSut();
     const compareSpy = jest.spyOn(bcrypt, 'compare');
     await sut.compare('any_value', 'any_hash');
     expect(compareSpy).toHaveBeenCalledWith('any_value', 'any_hash');
   });
 
-  test('Should return true when comparer succeeds', async () => {
+  test('Should return true when compare succeeds', async () => {
     const { sut } = makeSut();
     const isValid = await sut.compare('any_value', 'any_hash');
     expect(isValid).toBe(true);
+  });
+
+  test('Should return false when compare fails', async () => {
+    const { sut } = makeSut();
+    const compareSpy = jest.spyOn(bcrypt, 'compare') as unknown as jest.Mock<
+      ReturnType<(key: boolean) => Promise<boolean>>,
+      Parameters<(key: boolean) => Promise<boolean>>
+    >;
+    compareSpy.mockReturnValueOnce(new Promise((resolve) => resolve(false)));
+
+    const isValid = await sut.compare('any_value', 'any_hash');
+    expect(isValid).toBe(false);
   });
 });
