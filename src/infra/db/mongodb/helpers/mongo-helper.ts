@@ -1,4 +1,4 @@
-import { Collection, MongoClient } from 'mongodb';
+import { Collection, MongoClient, ObjectId } from 'mongodb';
 
 export const MongoHelper = {
   client: null as MongoClient,
@@ -19,5 +19,9 @@ export const MongoHelper = {
       await this.connect(this.uri);
     }
     return this.client.db().collection(name);
+  },
+
+  parseToObjectId(value: string): ObjectId {
+    return new ObjectId(value);
   },
 };
