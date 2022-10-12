@@ -6,8 +6,9 @@
   "scripts": {
     "start": "node dist/main/server.js",
     "start:dev": "nodemon -L --watch ./dist dist/main/server.js",
+    "dev": "npm run up && npx tsc -w",
     "build": "rimraf dist && tsc",
-    "up": "npm run build && docker-compose up",
+    "up": "npm run build && docker-compose up -d",
     "down": "docker-compose down -d",
     "test": "jest --passWithNoTests --silent --noStackTrace --runInBand",
     "test:verbose": "jest --passWithNoTests --runInBand",
