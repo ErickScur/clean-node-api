@@ -13,7 +13,7 @@ services:
     restart: always
     image: node:16
     working_dir: /usr/src/clean-node-api
-    command: bash -c "npm install && npm start"
+    command: bash -c "npm install && npm run start:dev"
     volumes:
       - ./dist:/usr/src/clean-node-api/dist
       - ./package.json:/usr/src/clean-node-api/package.json
