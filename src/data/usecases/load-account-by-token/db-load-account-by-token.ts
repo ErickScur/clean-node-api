@@ -12,7 +12,13 @@ export class DbLoadAccountByToken implements LoadAccountByToken {
   async load(token: string, role?: string): Promise<AccountModel> {
     const accessToken = await this.decrypter.decrypt(token);
     if (accessToken) {
-      await this.loadAccountByTokenRepository.loadByToken(token, role);
+      const account = await this.loadAccountByTokenRepository.loadByToken(
+        token,
+        role,
+      );
+      if (account) {
+        return account;
+      }
     }
     return null;
   }
